@@ -3,20 +3,20 @@
  
  local ver = "v0.6 "
  surface.PlaySound("buttons/button16.wav")
- chat.AddText(Color(0, 255, 50), "RazorTrain Initialized : ".. ver, Color(200, 200, 200, 200), os.date())
+ chat.AddText(Color(0, 255, 50), "RazorTrain Initialized! Type rz_menu in console to configure it! : ".. ver, Color(200, 200, 200, 200), os.date())
  
  timer.Simple(0.5, function()
  surface.PlaySound("buttons/button16.wav")
  chat.AddText(Color(0, 255, 100), "Created by ", Color(0, 200, 100), "Trial - ", Color(200, 200, 200), "STEAM_0:1:68249268")
  end)
  
- CreateClientConVar("rz_espname", 1, true, false)
+ CreateClientConVar("rz_espname", 0, true, false)
  CreateClientConVar("rz_esphp", 0, true, false)
  CreateClientConVar("rz_espping", 0, true, false)
  CreateClientConVar("rz_espdistance", 0, true, false)
- CreateClientConVar("rz_esp", 1, true, false)
- CreateClientConVar("rz_xray", 0, true, false)
- CreateClientConVar("rz_chams", 0, true, false)
+ CreateClientConVar("rz_esp", 0, true, false)
+ CreateClientConVar("rz_xray", 1, true, false)
+ CreateClientConVar("rz_chams", 1, true, false)
  CreateClientConVar("rz_tracers", 0, true, false)
  CreateClientConVar("rz_headtracers", 0, true, false)
  CreateClientConVar("rz_eyetracers", 0, true, false)
