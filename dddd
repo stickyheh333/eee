@@ -1,0 +1,1028 @@
+ ----made by trial------
+ ------RAZORTRAIN--
+ 
+ local ver = "v0.6 "
+ surface.PlaySound("buttons/button16.wav")
+ chat.AddText(Color(0, 255, 50), "RazorTrain Initialized : ".. ver, Color(200, 200, 200, 200), os.date())
+ 
+ timer.Simple(0.5, function()
+ surface.PlaySound("buttons/button16.wav")
+ chat.AddText(Color(0, 255, 100), "Created by ", Color(0, 200, 100), "Trial - ", Color(200, 200, 200), "STEAM_0:1:68249268")
+ end)
+ 
+ CreateClientConVar("rz_espname", 1, true, false)
+ CreateClientConVar("rz_esphp", 0, true, false)
+ CreateClientConVar("rz_espping", 0, true, false)
+ CreateClientConVar("rz_espdistance", 1, true, false)
+ CreateClientConVar("rz_esp", 1, true, false)
+ CreateClientConVar("rz_xray", 0, true, false)
+ CreateClientConVar("rz_chams", 0, true, false)
+ CreateClientConVar("rz_tracers", 1, true, false)
+ CreateClientConVar("rz_headtracers", 1, true, false)
+ CreateClientConVar("rz_eyetracers", 1, true, false)
+ CreateClientConVar("rz_fov", 90, true, false)
+ CreateClientConVar("rz_traceprop", 1, true, false)
+ CreateClientConVar("rz_hud", 1, true, false)
+ CreateClientConVar("rz_crosshair", 1, true, false)
+ CreateClientConVar("rz_espvelocity", 1, true, false)
+ CreateClientConVar("rz_skybox", 1, true, false)
+ CreateClientConVar("rz_skyboxr", 255, true, false)
+ CreateClientConVar("rz_skyboxg", 255, true, false)
+ CreateClientConVar("rz_skyboxb", 255, true, false)
+ CreateClientConVar("rz_crosshairsize", 10, true, false)
+ 
+local ply = LocalPlayer()
+ 
+ 
+local function weaponpos()
+    if ply:GetWeapon("weapon_physgun") then
+        local wep = ply:GetViewModel()
+        local attachment = wep:LookupAttachment("muzzle")
+        local atpos = wep:GetAttachment(attachment).Pos
+        wep:AddEffects(256)
+        return atpos
+    end
+end
+ 
+local function tracers()
+    if GetConVarNumber("rz_tracers") == 1 then
+        tracers = 1
+        for k,v in pairs(player.GetAll()) do
+            if v != ply and team.GetName(ply:Team()) != "Spectator" then
+                local vpos = v:GetPos()
+                local ppos = ply:GetPos()
+                local speed = v:GetVelocity():Length() / 2
+                local trace = util.QuickTrace(weaponpos(), v:GetPos(), nil)
+                cam.Start3D()
+                   
+                    render.DrawLine(weaponpos(), vpos, Color(speed, 0, 255, 0), true)
+                cam.End3D()
+               
+                local teams
+               
+            end
+        end
+            else
+                tracers = 0
+    end
+end
+hook.Add("HUDPaint", "aa", tracers)
+ 
+local function pcham()
+    for k,v in pairs(player.GetAll()) do
+        if GetConVarNumber("rz_chams") == 1 then
+        chams = 1
+            local distance = math.floor(v:GetPos():Distance(ply:GetPos()))
+            if v != ply and v:Alive() then
+                cam.Start3D()
+                cam.IgnoreZ(true)
+                    v:SetRenderMode(RENDERMODE_TRANSALPHA)
+                    v:SetColor(Color(255,105,180,100))
+                    //render.MaterialOverride(Material("models/wireframe") 
+                    render.SetColorModulation(0, 0, 255)
+                    v:DrawModel()
+                    render.DrawWireframeBox(v:GetPos(), v:GetAngles(), v:OBBMins() + Vector(4.5, 4.5, 4.5), v:OBBMaxs() - Vector(4.5, 4.5, 4.5), Color(0,0, 0), false)
+                    render.DrawWireframeBox(v:GetPos(), v:GetAngles(), v:OBBMins() + Vector(5, 5, 5), v:OBBMaxs() - Vector(5, 5, 5), Color(0, 255, 0), false)
+               
+                cam.End3D()
+               
+               
+            else
+            end
+            else
+                chams = 0
+                v:SetColor(Color(255,105,180,255))
+        end    
+    end
+end
+hook.Add("RenderScreenspaceEffects", "pcham", pcham)
+ 
+local function cham()
+ 
+ 
+    for k,v in pairs(ents.FindByClass("prop_physics")) do
+        if GetConVarNumber("rz_xray") == 1 then
+            xray = 1
+            cam.Start3D()
+            local distance = v:GetPos():Distance(ply:GetPos())
+                cam.IgnoreZ(true)
+                v:SetRenderMode(RENDERMODE_TRANSALPHA)
+                v:SetColor(Color(0,255,255,255))
+                // render.MaterialOverride(Material("phoenix_storms/fender_white"))
+                v:DrawModel()  
+                render.DrawWireframeBox(v:GetPos(), v:GetAngles(), v:OBBMins() + Vector(5, 5, 5), v:OBBMaxs() - Vector(5, 5, 5), Color(0,255,255,255))
+                v:AddEffects(256)
+            cam.End3D()
+            else
+                xray = 0
+                v:SetColor(Color(255,255,255,255))
+        end
+    end
+end
+hook.Add("RenderScreenspaceEffects", "cham", cham)
+ 
+hook.Add("PreDrawPlayerHands", "asas", function(a)
+ 
+    a:SetModel("models/weapons/c_arms_hev.mdl")
+ 
+end)
+ 
+ 
+ 
+local function eyetracers()
+ 
+if GetConVarNumber("rz_eyetracers") == 1 then
+    eyetracers = 1
+    for k,v in pairs(player.GetAll()) do
+    if v:Alive() and v != ply then
+            cam.Start3D()
+        //  if v:GetVelocity():Length() <= 400 then
+                local vtrace = v:GetEyeTrace().HitPos
+                local headpos = v:EyePos()         
+                render.DrawLine(vtrace, headpos, Color(100, 200, 100)) 
+        //  end
+            cam.End3D()
+            end
+        end
+        else
+        eyetracers = 0
+    end
+end
+hook.Add("RenderScreenspaceEffects", "eyetraceee", eyetracers)
+ 
+local function fov()
+    local ta = {}
+    ta.fov = GetConVarNumber("rz_fov")
+    return ta
+end
+hook.Add("CalcView", "fov", fov)
+ 
+ 
+local function esp()
+ 
+    if GetConVarNumber("rz_esp") == 1 then
+        esp = 1
+        for k,v in pairs(player.GetAll()) do
+            if v != ply and v:Alive() then
+                local vposx = v:EyePos():ToScreen().x
+                local vposy = v:EyePos():ToScreen().y
+                local distance = math.floor(v:GetPos():Distance(ply:GetPos()))
+                local sep = -30
+                if GetConVarNumber("rz_espname") == 1 then
+               
+                   
+                    draw.SimpleTextOutlined(string.upper(v:Name()), "Default", vposx, vposy + sep, Color(255, 255, 255, 255), 1, 4, 1, Color(0, 0, 0, 255))
+                    sep = sep + 10
+                end
+               
+                if GetConVarNumber("rz_espdistance") == 1 then
+                   
+                    draw.SimpleTextOutlined(distance, "Default", vposx, vposy + sep, Color(255, 255, 255, 255), 1, 4, 1, Color(0, 0, 0, 255))
+                    sep = sep + 10
+                end
+               
+                if GetConVarNumber("rz_esphp") == 1 then
+               
+                    draw.SimpleTextOutlined(v:Health() .. " HP", "Default", vposx, vposy + sep, Color(255, 255, 255, 255), 1, 4, 1, Color(0, 0, 0, 255))
+                    sep = sep + 10
+                end
+               
+                if GetConVarNumber("rz_espping") == 1 then
+               
+                    draw.SimpleTextOutlined(v:Ping() .. " MS", "Default", vposx, vposy + sep, Color(255, 255, 255, 255), 1, 4, 1, Color(0, 0, 0, 255))
+                    sep = sep + 10
+                   
+                end
+               
+                    if GetConVarNumber("rz_espvelocity") == 1 then
+               
+                    draw.SimpleTextOutlined(math.floor(v:GetVelocity():Length()), "Default", vposx, vposy + sep, Color(255, 255, 255, 255), 1, 4, 1, Color(0, 0, 0, 255))
+                    sep = sep + 10
+                   
+                end
+               
+                end
+            end
+        else
+        esp = 0
+    end
+ 
+end
+hook.Add("HUDPaint", "esp", esp)
+ 
+concommand.Add("rz_rotateup", function()
+            RunConsoleCommand("+jump")
+    ply:SetEyeAngles(Angle(-ply:EyeAngles().x, ply:EyeAngles().y - 180, ply:EyeAngles().z))
+    timer.Simple(0.1, function()
+        RunConsoleCommand("-jump")     
+    end)
+   
+end)
+ 
+ 
+concommand.Add("rz_rotate", function()
+    ply:SetEyeAngles(Angle(ply:EyeAngles().x, ply:EyeAngles().y - 180, ply:EyeAngles().z))
+end)
+ 
+ 
+concommand.Add("+rz_bhop", function()
+    hook.Add("Think", "bop", function()
+    if ply:IsOnGround() then
+        RunConsoleCommand("+jump")     
+    else
+        RunConsoleCommand("-jump") 
+    end
+    end)
+end)
+ 
+ 
+ 
+concommand.Add("-rz_bhop", function()
+    hook.Remove("Think", "bop")
+    RunConsoleCommand("-jump")
+end)
+ 
+local function crosshair()
+    if GetConVarNumber("rz_crosshair") == 1 then
+        crosshair = 1
+        local m = ply:GetEyeTraceNoCursor().HitPos:ToScreen()
+        local center = ScrH() / 2
+        local center2 = ScrW() / 2
+       
+        if ply:GetEyeTrace().HitSky then
+            surface.SetDrawColor(0, 0, 0)
+            surface.DrawLine(m.x - GetConVarNumber("rz_crosshairsize"), m.y, m.x + GetConVarNumber("rz_crosshairsize"), m.y)
+            surface.DrawLine(m.x, m.y + GetConVarNumber("rz_crosshairsize"), m.x, m.y - GetConVarNumber("rz_crosshairsize"))
+        else
+            surface.SetDrawColor(255, 255, 255)
+            surface.DrawLine(m.x - GetConVarNumber("rz_crosshairsize"), m.y, m.x + GetConVarNumber("rz_crosshairsize"), m.y)
+            surface.DrawLine(m.x, m.y + GetConVarNumber("rz_crosshairsize"), m.x, m.y - GetConVarNumber("rz_crosshairsize"))
+       
+        end
+        else
+        crosshair = 0
+    end
+   
+end
+hook.Add("HUDPaint", "ch", crosshair)
+ 
+local function headtracers()
+    if GetConVarNumber("rz_headtracers") == 1 then
+        headtracers = 1
+        for k,v in pairs(player.GetAll()) do
+            if v != ply and v:Alive() then
+                local line = util.QuickTrace(v:EyePos(), Vector(0, 0, 10000000),v )
+                local vel = v:GetVelocity():Length()
+                cam.Start3D()
+                    cam.IgnoreZ(true)
+ 
+                            render.DrawLine(v:GetPos(), line.HitPos, Color(100, 0, vel))
+                           
+                            if line.HitWorld == false then
+                                    render.DrawLine(line.HitPos + Vector(60, 0, 0), line.HitPos, Color(255, 255, 200))
+                                    render.DrawLine(line.HitPos - Vector(60, 0, 0), line.HitPos, Color(255, 255, 200))
+                       
+                                    render.DrawLine(line.HitPos + Vector(0, 60, 0), line.HitPos, Color(255, 255, 200))
+                                    render.DrawLine(line.HitPos - Vector(0, 60, 0), line.HitPos, Color(255, 255, 200))
+                                   
+                                else
+                               
+                                    render.DrawLine(line.HitPos + Vector(40, 0, 0), line.HitPos, Color(100, vel / 3, 0))
+                                    render.DrawLine(line.HitPos - Vector(40, 0, 0), line.HitPos, Color(100,  vel / 3, 0))
+                       
+                                    render.DrawLine(line.HitPos + Vector(0, 40, 0), line.HitPos, Color(100, vel / 3, 0))
+                                    render.DrawLine(line.HitPos - Vector(0, 40, 0), line.HitPos, Color(100, vel / 3, 0))
+                            end
+                cam.End3D()
+            end
+        end
+        else
+    headtracers = 0
+    end
+   
+end
+hook.Add("RenderScreenspaceEffects", "head", headtracers)
+ 
+local function safe()
+    function render.Capture() chat.AddText(Color(255, 0, 0), "render.Capture() blocked.") return false end
+    function render.CapturePixels() chat.AddText(Color(255, 0, 0), "render.CapturePixels() blocked.") return false end
+    function gui.OpenURL() chat.AddText(Color(255, 0, 0), "gui.OpenURL() blocked.") return false end
+    function http.Fetch() chat.AddText(Color(255, 0, 0), "http.Fetch() blocked.") return false end
+    function file.Read() chat.AddText(Color(255, 0, 0), "file.Read() blocked.") return false end
+    function file.Write() chat.AddText(Color(255, 0, 0), "file.Write() blocked.") return false end
+    function file.Append() chat.AddText(Color(255, 0, 0), "file.Append() blocked.") return false end
+    function file.CreateDir() chat.AddText(Color(255, 0, 0), "file.CreateDir() blocked.") return false end
+    function file.Delete() chat.AddText(Color(255, 0, 0), "file.Delete() blocked.") return false end
+    function file.Exists() chat.AddText(Color(255, 0, 0), "file.Exists() blocked.") return false end
+    local a = FindMetaTable("Player")
+    function a:ConCommand() chat.AddText(Color(255, 0, 0), "ConCommand() blocked.") return false end
+end
+ 
+ 
+ 
+local function holdingprop(p, w, b, e)
+    if IsValid(d) then
+        return d:GetPos():ToScreen()
+    end
+end
+hook.Add("DrawPhysgunBeam", "beam", holdingprop)
+ 
+local function screenprop()
+    for k,v in pairs(player.GetAll()) do
+        local vpos = v:GetPos():ToScreen()
+       
+        if holdingprop == vpos then
+            draw.SimpleText("aaa", "Default", vpos.x, vpos.y, Color(255, 0, 0))
+        end
+    end
+end
+hook.Add("HUDPaint", "sdc", screenprop)
+ 
+local function skybox()
+    if GetConVarNumber("rz_skybox") == 1 then
+    skybox = 1
+        render.Clear(GetConVarNumber("rz_skyboxr"), GetConVarNumber("rz_skyboxg"), GetConVarNumber("rz_skyboxb"), 255)
+   
+        return true
+    else
+        skybox = 0
+    end
+end
+hook.Add("PreDrawSkyBox", "sb", skybox)
+ 
+local function noise()
+    if GetConVarNumber("rz_traceprop") == 1 then
+    traceprop = 1
+        for k,v in pairs(ents.FindByClass("prop_physics")) do
+                local distance = math.floor(v:GetPos():Distance(ply:GetPos())) 
+                if distance < 500 then
+                    cam.Start3D()
+                   
+                            render.DrawLine(v:GetPos(), ply:GetPos(), Color(255, 20 + distance / 100 ,50))
+                            render.DrawWireframeBox(v:GetPos(), v:GetAngles(), v:OBBMins() + Vector(10, 10, 10), v:OBBMaxs() - Vector(10, 10, 10), Color(0, Lerp(0.5, 0, 255 * FrameTime()), 0), false)
+                    cam.End3D()
+                end
+            end
+            else
+            traceprop = 0
+    end
+end
+ 
+hook.Add("HUDPaint", "noisse", noise)
+ 
+/*local function playermusics()
+    for k,v in pairs(player.GetAll()) do
+        if v != ply then
+            sound.Play(playermusic[1], v:GetPos(), 60, 100, 1)
+        end
+    end
+ 
+end
+hook.Add("Think", "music", playermusics)*/
+ 
+local function hud()
+    if GetConVarNumber("rz_hud") == 1 then
+        hud = 1
+        local velocity = math.floor(ply:GetVelocity():Length())
+        local pos = ply:GetPos()
+       
+        //draw.RoundedBox(4, 5, 5, 100, 60, Color(50, 50, 50, 100))
+        draw.SimpleText("VELOCITY : ".. velocity, "Default", 10, 10, Color(255, 255, 255))
+        draw.SimpleText("LATENCY : " .. ply:Ping(), "Default", 10, 20, Color(255, 255, 255))
+        draw.SimpleText("FPS : " .. math.Round(1 /FrameTime()), "Default", 10, 30, Color(255, 255, 255))
+        else
+            hud = 0
+    end
+end
+hook.Add("HUDPaint", "huda",  hud)
+ 
+ 
+local function rzmenu()
+    local parent = vgui.Create("DFrame")
+            surface.PlaySound("buttons/button14.wav")
+        parent:SetSize(260, 500)
+        parent:Center()
+        parent:SetTitle("RazorTrain "..ver.." : by Trial")
+        parent:MakePopup()
+       
+       
+        parent.Paint = function(self, w, h)
+       
+            draw.RoundedBox(2, 0, 0, w, h, Color(80, 80, 80, 200))
+            draw.RoundedBox(2, 0, 1, w, 22, Color(50, 50, 50, 200))
+        //  draw.RoundedBox(2, 4, 25, w - 8, h - 28, Color(20, 20, 20, 200))
+            surface.SetDrawColor(100, 255, 0, 200)
+            surface.DrawOutlinedRect(0, 0, w, h)
+           
+        surface.SetDrawColor(20, 20, 20, 255)
+            surface.DrawLine(10, 400, 250, 400)
+           
+                surface.SetDrawColor(150, 150, 150, 255)
+            surface.DrawLine(10, 401, 250, 401)
+       
+    surface.SetDrawColor(20, 20, 20, 255)
+            surface.DrawLine(10, 199, 250, 199)
+           
+                surface.SetDrawColor(150, 150, 150, 255)
+            surface.DrawLine(10, 200, 250, 200)    
+                       
+        surface.SetDrawColor(20, 20, 20, 255)
+            surface.DrawLine(10, 190, 250, 190)
+           
+                surface.SetDrawColor(150, 150, 150, 255)
+            surface.DrawLine(10, 191, 250, 191)    
+                   
+        surface.SetDrawColor(20, 20, 20, 255)
+            surface.DrawLine(10, 30, 250, 30)
+           
+                    surface.SetDrawColor(150, 150, 150, 255)
+            surface.DrawLine(10, 31, 250, 31)
+           
+           
+        surface.SetDrawColor(20, 20, 20, 255)
+            surface.DrawLine(10, 30, 250, 30)
+           
+                    surface.SetDrawColor(150, 150, 150, 255)
+            surface.DrawLine(10, 31, 250, 31)
+        end
+       
+   
+           
+            local b5 = vgui.Create("DButton", parent)
+        b5:SetPos(20, 40)
+        b5:SetText("HEADTRACERS")
+        b5:SetSize(100, 20)
+        b5:SetTextColor(Color(255, 255, 255))
+       
+        //b5.DoRightClick = function()
+       
+        /*
+            local tracemenu = vgui.Create("DFrame")
+                tracemenu:SetTitle("Trace Menu")
+                tracemenu:SetSize(200, 400)
+                tracemenu:MakePopup()
+                tracemenu:Center()
+                tracemenu.IsActive = function()
+                    b5:SetEnabled(false)
+                   
+                end
+                tracemenu.OnClose = function()
+                    if IsValid(b5) then
+                        b5:SetEnabled(true)
+                    end
+                end
+                tracemenu.Paint = function(self, w, h)
+                draw.RoundedBox(2, 0, 0, w, 22, Color(50, 50, 50, 200))
+                draw.RoundedBox(2, 0, 0, w, h, Color(80, 80, 80, 200))
+                surface.SetDrawColor(100, 255, 0, 200)
+                surface.DrawOutlinedRect(0, 0, w, h)
+                end
+               
+       
+        end*/
+       
+       
+        b5.DoClick = function()
+ 
+        if GetConVarNumber("rz_headtracers") == 0 then
+            headtracers = 1
+            surface.PlaySound("buttons/button17.wav")
+            RunConsoleCommand("rz_headtracers", 1)
+        else
+            headtracers = 0
+            surface.PlaySound("buttons/button18.wav")
+            RunConsoleCommand("rz_headtracers", 0)
+       
+            end
+        end
+   
+        b5.Paint = function(self, w, h)
+                if headtracers == 1 then
+                    surface.SetDrawColor(60, 60, 60, 255)
+                    surface.DrawRect(0, 0, w, h)
+                   
+                    surface.SetDrawColor(20, 255, 20, 200)
+                    surface.DrawOutlinedRect(0, 0, w, h)
+           
+                else
+                    surface.SetDrawColor(50, 50, 50, 255)
+                    surface.DrawRect(0, 0, w, h)
+                   
+                    surface.SetDrawColor(120, 120, 120, 200)
+                    surface.DrawOutlinedRect(0, 0, w, h)
+            end
+           
+        end
+   
+                local b6 = vgui.Create("DButton", parent)
+        b6:SetPos(135, 40)
+        b6:SetText("XRAY")
+        b6:SetSize(100, 20)
+        b6:SetTextColor(Color(255, 255, 255))
+        b6.DoClick = function()
+ 
+        if GetConVarNumber("rz_xray") == 0 then
+            xray = 1
+            surface.PlaySound("buttons/button17.wav")
+            RunConsoleCommand("rz_xray", 1)
+        else
+            xray = 0
+            surface.PlaySound("buttons/button18.wav")
+            RunConsoleCommand("rz_xray", 0)
+       
+            end
+        end
+   
+        b6.Paint = function(self, w, h)    
+            if xray == 1 then
+               
+                surface.SetDrawColor(60, 60, 60, 255)
+                surface.DrawRect(0, 0, w, h)
+               
+                surface.SetDrawColor(20, 255, 20, 200)
+                surface.DrawOutlinedRect(0, 0, w, h)
+           
+            else
+                surface.SetDrawColor(50, 50, 50, 255)
+                surface.DrawRect(0, 0, w, h)
+               
+                surface.SetDrawColor(120, 120, 120, 200)
+                surface.DrawOutlinedRect(0, 0, w, h)
+            end
+           
+        end
+       
+        local b7 = vgui.Create("DButton", parent)
+            b7:SetPos(135, 70)
+            b7:SetText("CHAMS")
+            b7:SetSize(100, 20)
+            b7:SetTextColor(Color(255, 255, 255))
+            b7.DoClick = function()
+ 
+        if GetConVarNumber("rz_chams") == 0 then
+            chams = 1
+            surface.PlaySound("buttons/button17.wav")
+            RunConsoleCommand("rz_chams", 1)
+        else
+            chams = 0
+            surface.PlaySound("buttons/button18.wav")
+            RunConsoleCommand("rz_chams", 0)
+       
+            end
+        end
+   
+        b7.Paint = function(self, w, h)    
+                if chams == 1 then
+               
+                    surface.SetDrawColor(60, 60, 60, 255)
+                    surface.DrawRect(0, 0, w, h)
+                   
+                    surface.SetDrawColor(20, 255, 20, 200)
+                    surface.DrawOutlinedRect(0, 0, w, h)
+           
+                else
+                    surface.SetDrawColor(50, 50, 50, 255)
+                    surface.DrawRect(0, 0, w, h)
+                   
+                    surface.SetDrawColor(120, 120, 120, 200)
+                    surface.DrawOutlinedRect(0, 0, w, h)
+            end
+        end
+       
+        local s4 = vgui.Create("DNumSlider", parent)
+                s4:SetMinMax(20, 179)
+                s4.TextArea:SetTextColor(Color(200, 200, 200))
+                s4:SetPos(20, 210)
+                s4:SetSize(250, 20)
+                s4:SetText("    Field of View")
+                s4:SetConVar("rz_fov")
+                s4:SetDecimals(0)
+               
+           
+                local b8 = vgui.Create("DButton", parent)
+        b8:SetPos(20, 70)
+        b8:SetText("EYETRACERS")
+        b8:SetSize(100, 20)
+        b8:SetTextColor(Color(255, 255, 255))
+        b8.DoClick = function()
+ 
+        if GetConVarNumber("rz_eyetracers") == 0 then
+            eyetracers = 1
+            surface.PlaySound("buttons/button17.wav")
+            RunConsoleCommand("rz_eyetracers", 1)
+        else
+            eyetracers = 0
+            surface.PlaySound("buttons/button18.wav")
+            RunConsoleCommand("rz_eyetracers", 0)
+       
+            end
+        end
+   
+        b8.Paint = function(self, w, h)
+               
+                if eyetracers == 1 then
+               
+                surface.SetDrawColor(60, 60, 60, 255)
+                surface.DrawRect(0, 0, w, h)
+               
+                surface.SetDrawColor(20, 255, 20, 200)
+                surface.DrawOutlinedRect(0, 0, w, h)
+           
+            else
+                surface.SetDrawColor(50, 50, 50, 255)
+                surface.DrawRect(0, 0, w, h)
+               
+                surface.SetDrawColor(120, 120, 120, 200)
+                surface.DrawOutlinedRect(0, 0, w, h)
+            end
+           
+        end
+       
+                local b9 = vgui.Create("DButton", parent)
+        b9:SetPos(20, 100)
+        b9:SetText("ESP")
+        b9:SetSize(100, 20)
+        b9:SetTextColor(Color(255, 255, 255))
+        b9.DoClick = function()
+   
+        if GetConVarNumber("rz_esp") == 0 then
+            esp = 1
+            surface.PlaySound("buttons/button17.wav")
+            RunConsoleCommand("rz_esp", 1)
+        else
+            esp = 0
+            surface.PlaySound("buttons/button18.wav")
+            RunConsoleCommand("rz_esp", 0)
+       
+            end
+        end
+   
+        b9.Paint = function(self, w, h)
+               
+                if esp == 1 then
+               
+                surface.SetDrawColor(60, 60, 60, 255)
+                surface.DrawRect(0, 0, w, h)
+               
+                surface.SetDrawColor(20, 255, 20, 200)
+                surface.DrawOutlinedRect(0, 0, w, h)
+           
+            else
+                surface.SetDrawColor(50, 50, 50, 255)
+                surface.DrawRect(0, 0, w, h)
+               
+                surface.SetDrawColor(120, 120, 120, 200)
+                surface.DrawOutlinedRect(0, 0, w, h)
+            end
+           
+        end
+       
+            b9.DoRightClick = function()
+       
+       
+            local espmenu = vgui.Create("DFrame")
+                espmenu:SetTitle("ESP Menu")
+                espmenu:SetSize(200, 200)
+                espmenu:MakePopup()
+                espmenu:Center()
+                espmenu.IsActive = function()
+                    b9:SetEnabled(false)
+                   
+                end
+                espmenu.OnClose = function()
+                    if IsValid(b9) then
+                        b9:SetEnabled(true)
+                    end
+                end
+                espmenu.Paint = function(self, w, h)
+               
+                draw.RoundedBox(2, 0, 0, w, h, Color(80, 80, 80, 200))
+                draw.RoundedBox(2, 0, 0, w, 22, Color(40, 40, 40, 200))
+                surface.SetDrawColor(100, 255, 0, 200)
+                surface.DrawOutlinedRect(0, 0, w, h)
+               
+                end
+               
+                local e1 = vgui.Create("DCheckBoxLabel", espmenu)
+                    e1:SetPos(20, 40)
+                    e1:SetText("Name")
+                    e1:SetConVar("rz_espname")
+               
+                   
+                local e2 = vgui.Create("DCheckBoxLabel", espmenu)
+                    e2:SetPos(20, 65)
+                    e2:SetText("Ping")
+                    e2:SetConVar("rz_espping")
+                   
+                local e3 = vgui.Create("DCheckBoxLabel", espmenu)
+                    e3:SetPos(20, 90)
+                    e3:SetText("Distance")
+                    e3:SetConVar("rz_espdistance")
+               
+                local e4 = vgui.Create("DCheckBoxLabel", espmenu)
+                    e4:SetPos(20, 115)
+                    e4:SetText("Health")
+                    e4:SetConVar("rz_esphp")
+                   
+                local e5 = vgui.Create("DCheckBoxLabel", espmenu)
+                    e5:SetPos(20, 140)
+                    e5:SetText("Velocity")
+                    e5:SetConVar("rz_espvelocity")
+                   
+                   
+       
+        end
+       
+                local b10 = vgui.Create("DButton", parent)
+        b10:SetPos(135, 100)
+        b10:SetText("PLAYER TRACERS")
+        b10:SetSize(100, 20)
+        b10:SetTextColor(Color(255, 255, 255))
+        b10.DoClick = function()
+   
+        if GetConVarNumber("rz_tracers") == 0 then
+            tracers = 1
+            surface.PlaySound("buttons/button17.wav")
+            RunConsoleCommand("rz_tracers", 1)
+        else
+            tracers = 0
+            surface.PlaySound("buttons/button18.wav")
+            RunConsoleCommand("rz_tracers", 0)
+       
+            end
+        end
+   
+        b10.Paint = function(self, w, h)
+               
+                if tracers == 1 then
+               
+                surface.SetDrawColor(60, 60, 60, 255)
+                surface.DrawRect(0, 0, w, h)
+               
+                surface.SetDrawColor(20, 255, 20, 200)
+                surface.DrawOutlinedRect(0, 0, w, h)
+           
+            else
+                surface.SetDrawColor(50, 50, 50, 255)
+                surface.DrawRect(0, 0, w, h)
+               
+                surface.SetDrawColor(120, 120, 120, 200)
+                surface.DrawOutlinedRect(0, 0, w, h)
+            end
+           
+        end
+       
+       
+                local b11 = vgui.Create("DButton", parent)
+        b11:SetPos(20, 130)
+        b11:SetText("TRACE PROPS")
+        b11:SetSize(100, 20)
+        b11:SetTextColor(Color(255, 255, 255))
+        b11.DoClick = function()
+   
+        if GetConVarNumber("rz_traceprop") == 0 then
+            traceprop = 1
+            surface.PlaySound("buttons/button17.wav")
+            RunConsoleCommand("rz_traceprop", 1)
+        else
+            traceprop = 0
+            surface.PlaySound("buttons/button18.wav")
+            RunConsoleCommand("rz_traceprop", 0)
+       
+            end
+        end
+   
+        b11.Paint = function(self, w, h)
+               
+                if traceprop == 1 then
+               
+                surface.SetDrawColor(60, 60, 60, 255)
+                surface.DrawRect(0, 0, w, h)
+               
+                surface.SetDrawColor(20, 255, 20, 200)
+                surface.DrawOutlinedRect(0, 0, w, h)
+           
+            else
+                surface.SetDrawColor(50, 50, 50, 255)
+                surface.DrawRect(0, 0, w, h)
+               
+                surface.SetDrawColor(120, 120, 120, 200)
+                surface.DrawOutlinedRect(0, 0, w, h)
+            end
+           
+        end
+   
+   
+                local b12 = vgui.Create("DButton", parent)
+        b12:SetPos(135, 130)
+        b12:SetText("HUD STATS")
+        b12:SetSize(100, 20)
+        b12:SetTextColor(Color(255, 255, 255))
+        b12.DoClick = function()
+   
+        if GetConVarNumber("rz_hud") == 0 then
+            hud = 1
+            surface.PlaySound("buttons/button17.wav")
+            RunConsoleCommand("rz_hud", 1)
+        else
+            hud = 0
+            surface.PlaySound("buttons/button18.wav")
+            RunConsoleCommand("rz_hud", 0)
+       
+            end
+        end
+   
+        b12.Paint = function(self, w, h)
+               
+                if hud == 1 then
+               
+                surface.SetDrawColor(60, 60, 60, 255)
+                surface.DrawRect(0, 0, w, h)
+               
+                surface.SetDrawColor(20, 255, 20, 200)
+                surface.DrawOutlinedRect(0, 0, w, h)
+           
+            else
+                surface.SetDrawColor(50, 50, 50, 255)
+                surface.DrawRect(0, 0, w, h)
+               
+                surface.SetDrawColor(120, 120, 120, 200)
+                surface.DrawOutlinedRect(0, 0, w, h)
+            end
+           
+        end
+       
+       
+            local b13 = vgui.Create("DButton", parent)
+                b13:SetPos(135, 160)
+                b13:SetText("CROSSHAIR")
+                b13:SetSize(100, 20)
+                b13:SetTextColor(Color(255, 255, 255))
+                b13.DoRightClick = function()
+                    local crosshaire = vgui.Create("DFrame")
+                        crosshaire:SetTitle("Crosshair")
+                        crosshaire:SetSize(230, 100)
+                        crosshaire:MakePopup()
+                        crosshaire:Center()
+                        crosshaire.IsActive = function()
+                            b13:SetEnabled(false)
+                           
+                        end
+                        crosshaire.OnClose = function()
+                            if IsValid(b13) then
+                                b13:SetEnabled(true)
+                            end
+                        end
+                crosshaire.Paint = function(self, w, h)
+               
+                draw.RoundedBox(2, 0, 0, w, h, Color(80, 80, 80, 200))
+                draw.RoundedBox(2, 0, 0, w, 22, Color(40, 40, 40, 200))
+                surface.SetDrawColor(100, 255, 0, 200)
+                surface.DrawOutlinedRect(0, 0, w, h)
+               
+                end
+               
+                    local s11 = vgui.Create("DNumSlider", crosshaire)
+                s11:SetMinMax(20, 179)
+                s11.TextArea:SetTextColor(Color(200, 200, 200))
+                s11:SetPos(30, 50)
+                s11:SetSize(200, 20)
+                s11:SetText("Size")
+                s11:SetConVar("rz_crosshairsize")
+                s11:SetDecimals(0)
+                s11:SetMinMax(2, 100)
+            end
+               
+        b13.DoClick = function()
+   
+        if GetConVarNumber("rz_crosshair") == 0 then
+            crosshair = 1
+            surface.PlaySound("buttons/button17.wav")
+            RunConsoleCommand("rz_crosshair", 1)
+        else
+            crosshair = 0
+            surface.PlaySound("buttons/button18.wav")
+            RunConsoleCommand("rz_crosshair", 0)
+       
+            end
+        end
+   
+        b13.Paint = function(self, w, h)
+               
+                if crosshair == 1 then
+               
+                surface.SetDrawColor(60, 60, 60, 255)
+                surface.DrawRect(0, 0, w, h)
+               
+                surface.SetDrawColor(20, 255, 20, 200)
+                surface.DrawOutlinedRect(0, 0, w, h)
+           
+            else
+                surface.SetDrawColor(50, 50, 50, 255)
+                surface.DrawRect(0, 0, w, h)
+               
+                surface.SetDrawColor(120, 120, 120, 200)
+                surface.DrawOutlinedRect(0, 0, w, h)
+            end
+           
+        end
+       
+                    local b14 = vgui.Create("DButton", parent)
+        b14:SetPos(20, 160)
+        b14:SetText("REMOVE SKYBOX")
+        b14:SetSize(100, 20)
+        b14:SetTextColor(Color(255, 255, 255))
+        b14.DoClick = function()
+   
+        if GetConVarNumber("rz_skybox") == 0 then
+            skybox = 1
+            surface.PlaySound("buttons/button17.wav")
+            RunConsoleCommand("rz_skybox", 1)
+        else
+            skybox = 0
+            surface.PlaySound("buttons/button18.wav")
+            RunConsoleCommand("rz_skybox", 0)
+       
+            end
+        end
+   
+        b14.Paint = function(self, w, h)
+               
+                if skybox == 1 then
+               
+                surface.SetDrawColor(60, 60, 60, 255)
+                surface.DrawRect(0, 0, w, h)
+               
+                surface.SetDrawColor(20, 255, 20, 200)
+                surface.DrawOutlinedRect(0, 0, w, h)
+           
+            else
+                surface.SetDrawColor(50, 50, 50, 255)
+                surface.DrawRect(0, 0, w, h)
+               
+                surface.SetDrawColor(120, 120, 120, 200)
+                surface.DrawOutlinedRect(0, 0, w, h)
+            end
+           
+        end
+       
+        b14.DoRightClick = function()
+       
+       
+            local eskybox = vgui.Create("DFrame")
+                eskybox:SetTitle("Skybox")
+                eskybox:SetSize(230, 150)
+                eskybox:MakePopup()
+                eskybox:Center()
+                eskybox.IsActive = function()
+                    b14:SetEnabled(false)
+                   
+                end
+                eskybox.OnClose = function()
+                    if IsValid(b14) then
+                        b14:SetEnabled(true)
+                    end
+                end
+                eskybox.Paint = function(self, w, h)
+               
+                draw.RoundedBox(2, 0, 0, w, h, Color(80, 80, 80, 200))
+                draw.RoundedBox(2, 0, 0, w, 22, Color(40, 40, 40, 200))
+                surface.SetDrawColor(100, 255, 0, 200)
+                surface.DrawOutlinedRect(0, 0, w, h)
+               
+                end
+               
+            local s1 = vgui.Create("DNumSlider", eskybox)
+                s1.TextArea:SetTextColor(Color(200, 200, 200))
+               
+               
+                s1:SetText("         R")
+                s1:SetConVar("rz_skyboxr")
+                s1:SetDecimals(0)
+                s1:SetMinMax(0, 255)
+                s1:SetPos(10, 40)
+                s1:SetSize(200, 20)
+           
+               
+            local s2 = vgui.Create("DNumSlider", eskybox)
+                s2.TextArea:SetTextColor(Color(200, 200, 200))
+                s2:SetPos(10, 65)
+                s2:SetSize(200, 20)
+                s2:SetText("         G")
+                s2:SetConVar("rz_skyboxg")
+                s2:SetDecimals(0)
+                s2:SetMinMax(0, 255)
+           
+                   
+            local s3 = vgui.Create("DNumSlider", eskybox)
+                s3.TextArea:SetTextColor(Color(200, 200, 200))
+                s3:SetPos(10, 90)
+                s3:SetSize(200, 20)
+                s3:SetText("         B")
+                s3:SetConVar("rz_skyboxb")
+                s3:SetDecimals(0)
+                s3:SetMinMax(0, 255)
+        end
+ 
+end
+concommand.Add("rz_menu", rzmenu)
