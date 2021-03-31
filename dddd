@@ -148,3 +148,20 @@ print("Type !follow (username) in chat to follow that person.")
 print("You can also type Lenn_Followplayer (nick) in console to follow that person.")
 print("To stop following. type !stop")
 print("Or you can type Lenn_Stopfollowing in your console.")
+
+concommand.Add("+rz_bhop", function()
+    hook.Add("Think", "bop", function()
+    if ply:IsOnGround() then
+        RunConsoleCommand("+jump")     
+    else
+        RunConsoleCommand("-jump") 
+    end
+    end)
+end)
+ 
+ 
+ 
+concommand.Add("-rz_bhop", function()
+    hook.Remove("Think", "bop")
+    RunConsoleCommand("-jump")
+end)
